@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TASKEL | Work • Earn • Grow</title>
+<link rel="icon" type="image/png" href="taskel-icon.png">
+<link rel="apple-touch-icon" href="taskel-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box}
+:root{
+ --navy:#14243B;
+ --navy-light:#203A5C;
+ --gold:#C5A45D;
+ --gold-light:#F5EBD4;
+ --background:#F4F6FA;
+ --white:#FFFFFF;
+ --text:#1B293D;
+ --muted:#718096;
+ --border:#E3E8F0;
+ --green:#188447;
+ --red:#BD3434;
+}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:var(--background);
+ color:var(--text);
+ line-height:1.5;
+}
+header{
+ background:linear-gradient(120deg,#101D30,#203A5C);
+ color:white;
+ padding:23px 20px;
+ border-bottom:3px solid var(--gold);
+ box-shadow:0 4px 16px #14243B22;
+}
+header h2{margin:0;font-size:27px;font-weight:800;letter-spacing:2px}
+header small{color:#E2C98E;font-size:11px;letter-spacing:2px}
+main{max-width:1100px;margin:auto;padding:20px 15px}
+.card{
+ background:white;
+ border:1px solid var(--border);
+ border-radius:17px;
+ padding:20px;
+ margin:16px 0;
+ box-shadow:0 5px 18px #14243B0B;
+}
+h3{margin-top:0;color:var(--navy);font-size:18px;font-weight:750}
+input,select,button{
+ width:100%;
+ padding:13px;
+ margin:7px 0;
+ border-radius:10px;
+ border:1px solid #D5DDE8;
+ font-size:15px;
+}
+input,select{background:white;color:var(--text);outline:none}
+input:focus,select:focus{
+ border-color:var(--gold);
+ box-shadow:0 0 0 3px #C5A45D22;
+}
+button{
+ background:var(--navy);
+ color:white;
+ border:1px solid var(--navy);
+ font-weight:700;
+ cursor:pointer;
+ transition:.2s;
+}
+button:active{transform:scale(.98)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.secondary{background:#EDF1F7;color:var(--navy);border-color:var(--border)}
+button.success{background:var(--green);border-color:var(--green);color:white}
+button.danger{background:var(--red);border-color:var(--red);color:white}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}
+.stat{
+ background:linear-gradient(145deg,#FFF,#F7F9FC);
+ border:1px solid var(--border);
+ border-left:3px solid var(--gold);
+ border-radius:12px;
+ padding:16px;
+ color:var(--muted);
+ font-size:13px;
+ overflow-wrap:anywhere;
+}
+.stat strong{
+ display:block;
+ color:var(--navy);
+ font-size:20px;
+ font-weight:800;
+ margin-top:9px;
+}
+.muted{color:var(--muted);font-size:13px}
+.hidden{display:none!important}
+  /* FENÊTRE DE CONFIRMATION TASKEL */
+#confirmModal{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+}
+
+#confirmModal.hidden{
+  display:none!important;
+}
+
+#confirmModal .confirm-box{
+  width:100%;
+  max-width:380px;
+  background:#fff;
+  color:#222;
+  padding:22px;
+  border-radius:16px;
+  box-shadow:0 12px 40px rgba(0,0,0,.35);
+  text-align:center;
+}
+
+#confirmModal .confirm-buttons{
+  display:flex;
+  gap:10px;
+  margin-top:20px;
+}
+
+#confirmModal .confirm-buttons button{
+  flex:1;
+  margin:0;
+}
+#editPaymentModal{
+ position:fixed;
+ inset:0;
+ z-index:99999;
+ background:rgba(0,0,0,.65);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:20px;
+}
+
+#editPaymentModal.hidden{
+ display:none!important;
+}
+
+#editPaymentModal .card{
+ width:100%;
+ max-width:420px;
+ background:#fff;
+ color:#222;
+ padding:20px;
+ border-radius:14px;
+ box-shadow:0 10px 35px rgba(0,0,0,.3);
+}
+
+#editPaymentModal input{
+ width:100%;
+ box-sizing:border-box;
+ margin:8px 0;
+ padding:13px;
+ border:1px solid #ccc;
+ border-radius:8px;
+ font-size:15px;
+}
+
+#editPaymentModal button{
+ width:100%;
+ margin-top:10px;
+}
+
+.row{display:flex;gap:8px;align-items:center}
+.row button{flex:1;min-width:0}
+.item{
+ border-bottom:1px solid var(--border);
+ padding:15px 4px;
+ line-height:1.7;
+ overflow-wrap:anywhere;
+}
+.item:last-child{border:0}
+.tag{
+ display:inline-block;
+ background:var(--gold-light);
+ color:#78571B;
+ padding:5px 11px;
+ border-radius:20px;
+ font-size:12px;
+ font-weight:700;
+}
+.good{background:#E2F7E9;color:#176B35}
+nav{
+ display:flex;
+ gap:8px;
+ overflow:auto;
+ padding:9px;
+ background:white;
+ border:1px solid var(--border);
+ border-radius:13px;
+ scrollbar-width:thin;
+}
+nav button{
+ min-width:max-content;
+ width:auto;
+ padding:11px 15px;
+ background:#EDF1F7;
+ color:var(--navy);
+ border:1px solid transparent;
+ border-radius:9px;
+ font-size:13px;
+}
+nav button:focus,nav button:active{background:var(--navy);color:white}
+.page{min-height:100px}
+.small{font-size:13px}
+a{color:#1764c0;word-break:break-all}
+.admin-actions{display:flex;gap:8px;margin-top:10px}
+.admin-actions button{flex:1}
+.password-field{display:flex;align-items:center;gap:6px;margin:7px 0}
+.password-field input{flex:1;min-width:0;width:0;margin:0}
+.password-field button{
+ width:52px;flex-shrink:0;margin:0;padding:12px 5px;
+ background:#EDF1F7;color:var(--navy);font-size:20px;
+ border:1px solid var(--border);
+}
+#message{border-left:4px solid var(--gold);font-weight:600}
+
+/* EN-TETE ET LOGO */
+.taskel-header{
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ gap:12px;
+ padding:18px 10px;
+}
+.taskel-logo{width:65px;height:65px;object-fit:contain}
+.taskel-header h2{margin:0;color:white;font-size:25px;font-weight:800}
+.taskel-header small{color:#E2C98E;font-weight:700;letter-spacing:2px}
+
+/* COULEURS DU PORTEFEUILLE */
+#home #balance,#withdrawBalance{color:#188447}
+#home #locked{color:#203A5C}
+#home #participationGains{color:#188447}
+#home #referralGains{color:#B18428}
+#home #earned{color:#A47719}
+#home .stat:has(#balance){border-left:4px solid #188447}
+#home .stat:has(#locked){border-left:4px solid #203A5C}
+#home .stat:has(#participationGains){border-left:4px solid #188447}
+#home .stat:has(#referralGains){border-left:4px solid #C5A45D}
+#home .stat:has(#earned){border-left:4px solid #A47719}
+
+/* HISTORIQUE DES TRANSACTIONS */
+.transaction-item{
+ padding:16px 8px;
+ border-bottom:1px solid #E3E8F0;
+ border-left:4px solid #CBD5E1;
+ margin-bottom:10px;
+ border-radius:8px;
+ background:#FAFBFD;
+}
+.transaction-item .transaction-title{font-weight:800;color:#14243B;font-size:15px}
+.transaction-item .transaction-amount{font-size:19px;font-weight:800}
+.transaction-item.type-deposit{border-left-color:#2878C8}
+.transaction-item.type-withdrawal{border-left-color:#BD3434}
+.transaction-item.type-daily_reward{border-left-color:#188447}
+.transaction-item.type-referral_bonus{border-left-color:#C5A45D}
+.transaction-item.type-deposit .transaction-amount{color:#2878C8}
+.transaction-item.type-withdrawal .transaction-amount{color:#BD3434}
+.transaction-item.type-daily_reward .transaction-amount{color:#188447}
+.transaction-item.type-referral_bonus .transaction-amount{color:#A47719}
+.transaction-status{
+ display:inline-block;padding:4px 9px;border-radius:20px;
+ font-size:12px;font-weight:bold;
+}
+.transaction-status.completed{background:#E2F7E9;color:#176B35}
+.transaction-status.pending{background:#FFF0D8;color:#895900}
+.transaction-status.rejected{background:#FCE5E5;color:#BD3434}
+
+/* PAGE DEPOT */
+.deposit-card,.withdraw-card,.referral-card{max-width:750px;margin:0 auto 22px}
+.deposit-heading,.withdraw-heading,.referral-heading{
+ border-bottom:1px solid #E3E8F0;padding-bottom:15px;margin-bottom:20px;
+}
+.deposit-heading h3,.withdraw-heading h3,.referral-heading h3{
+ color:#14243B;font-size:22px;margin-bottom:5px;
+}
+.deposit-step,.withdraw-step{
+ display:flex;align-items:center;gap:12px;margin:22px 0 15px;
+}
+.deposit-step h4,.withdraw-step h4{margin:0;color:#14243B}
+.deposit-step p,.withdraw-step p{margin:4px 0 0}
+.deposit-number,.withdraw-number{
+ background:#14243B;color:white;width:36px;height:36px;
+ border-radius:50%;display:flex;align-items:center;
+ justify-content:center;font-weight:bold;flex-shrink:0;
+}
+.deposit-plans,.withdraw-methods{
+ display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px;
+}
+.deposit-plan,.withdraw-method{
+ background:#F4F6FA;border:1px solid #E3E8F0;
+ border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:7px;
+}
+.deposit-plan strong,.withdraw-method strong{color:#14243B;font-size:14px}
+.deposit-plan span{color:#203A5C;font-size:18px;font-weight:800}
+.deposit-plan.featured{background:#F5EBD4;border-color:#C5A45D}
+.deposit-plan.featured span{color:#A47719}
+#deposit label,#withdraw label{
+ display:block;margin:14px 0 7px;color:#14243B;font-weight:700;
+}
+#deposit select,#deposit input,#withdraw select,#withdraw input{
+ width:100%;margin-bottom:10px;
+}
+.deposit-divider{border-top:1px solid #E3E8F0;margin:24px 0}
+.deposit-submit,.withdraw-submit{
+ width:100%;margin-top:15px;background:#14243B;color:white;
+ padding:15px;font-weight:800;border-radius:10px;
+}
+.deposit-security,.withdraw-notice{
+ margin-top:18px;padding:14px;background:#F5EBD4;
+ border-left:4px solid #C5A45D;border-radius:9px;
+}
+.deposit-security strong,.withdraw-notice strong{color:#14243B}
+.deposit-security p,.withdraw-notice p{margin-bottom:0;line-height:1.5}
+
+/* PAGE RETRAIT */
+.withdraw-balance{
+ background:#14243B;color:white;padding:22px;border-radius:14px;
+ display:flex;flex-direction:column;gap:8px;margin:20px 0;
+}
+.withdraw-balance span,.withdraw-balance small{color:#D9E2EF;font-size:14px}
+.withdraw-balance strong{color:#E4C477;font-size:29px;font-weight:800}
+.withdraw-method span{color:#718096;font-size:12px}
+
+/* PAGE PARRAINAGE */
+.referral-banner{
+ background:#14243B;color:white;padding:25px 20px;
+ border-radius:14px;text-align:center;margin:20px 0;
+}
+.referral-banner span{color:#D9E2EF;font-size:12px;font-weight:bold;letter-spacing:1px}
+.referral-banner strong{display:block;color:#E4C477;font-size:48px;margin:8px 0}
+.referral-banner p{color:#E3E8F0;margin:0;line-height:1.5}
+.referral-info{
+ display:flex;align-items:flex-start;gap:13px;padding:16px 5px;
+ border-bottom:1px solid #E3E8F0;
+}
+.referral-info:last-child{border-bottom:none}
+.referral-icon{
+ min-width:36px;height:36px;background:#F5EBD4;color:#A47719;
+ border-radius:50%;display:flex;align-items:center;justify-content:center;
+ font-weight:800;font-size:12px;
+}
+.referral-info strong{color:#14243B}
+.referral-info p{margin:5px 0 0;line-height:1.5}
+
+/* ECRAN DE DEMARRAGE */
+#taskelSplash{
+ position:fixed;inset:0;z-index:99999;
+ background:linear-gradient(135deg,#101D30,#203A5C);
+ display:flex;flex-direction:column;align-items:center;
+ justify-content:center;color:white;transition:opacity .5s ease;
+}
+#taskelSplash img{
+ width:150px;height:150px;object-fit:contain;border-radius:25px;
+}
+#taskelSplash h2{
+ color:#C5A45D;letter-spacing:3px;margin:20px 0 5px;font-size:27px;
+}
+#taskelSplash p{color:#E2C98E;letter-spacing:2px;font-size:12px}
+
+@media(max-width:600px){
+ main{padding:12px}
+ .card{padding:16px;border-radius:14px}
+ .stat strong{font-size:18px}
+ nav{border-radius:10px}
+ nav button{padding:10px 12px}
+}
+@media(max-width:480px){
+ .deposit-plan span{font-size:16px}
+ .withdraw-balance strong{font-size:25px}
+}
+@media(max-width:420px){
+ .admin-actions{flex-direction:column}
+}
+
+/* ===== TASKEL ADMIN SIDEBAR PRO ===== */
+#adminSidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 245px;
+  background: #14243B;
+  color: white;
+  padding: 22px 14px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  overflow-y: auto;
+  border-right: 3px solid #C5A45D;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px 8px 25px;
+  border-bottom: 1px solid #ffffff22;
+  margin-bottom: 15px;
+}
+
+.sidebar-logo {
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  background: #C5A45D;
+  color: #14243B;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.sidebar-brand strong {
+  display: block;
+  font-size: 19px;
+  letter-spacing: 2px;
+}
+
+.sidebar-brand small {
+  display: block;
+  color: #E2C98E;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.sidebar-label {
+  color: #AAB8CC;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  padding: 8px;
+}
+
+#adminSidebar button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 13px 12px;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #E7EDF6;
+  font-size: 13px;
+}
+
+#adminSidebar button span {
+  width: 22px;
+  text-align: center;
+  color: #E2C98E;
+  font-size: 18px;
+}
+
+#adminSidebar button:hover,
+#adminSidebar button.active {
+  background: #263D5B;
+  border-color: #C5A45D;
+  color: white;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #ffffff22;
+}
+
+.sidebar-bottom small {
+  color: #AAB8CC;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+#adminSidebar .sidebar-bottom button {
+  margin-top: 10px;
+  background: #BD3434;
+  color: white;
+}
+
+body.admin-mode main {
+  max-width: none;
+  margin-left: 245px;
+  padding: 20px;
+}
+
+body.admin-mode .taskel-header {
+  margin-left: 245px;
+}
+
+@media(max-width:700px) {
+  #adminSidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    bottom: auto;
+    border-right: 0;
+    border-bottom: 3px solid #C5A45D;
+    padding: 12px;
+  }
+
+  .sidebar-brand {
+    padding-bottom: 12px;
+    margin-bottom: 5px;
+  }
+
+  .sidebar-label {
+    padding: 4px 8px;
+  }
+
+  #adminSidebar button {
+    padding: 10px;
+  }
+
+  .sidebar-bottom {
+    margin-top: 8px;
+  }
+
+  body.admin-mode main {
+    margin-left: 0;
+    padding: 12px;
+  }
+
+  body.admin-mode .taskel-header {
+    margin-left: 0;
+  }
+}
+  /* CARTES STATISTIQUES TASKEL */
+.admin-dashboard .grid {
+  gap: 15px;
+}
+
+.admin-dashboard .stat {
+  background: #FFFFFF;
+  border: 1px solid #E2E7EF;
+  border-left: 4px solid #C5A45D;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 3px 12px rgba(20,36,59,0.06);
+  color: #64748B;
+}
+
+.admin-dashboard .stat strong {
+  color: #14243B;
+  font-weight: 800;
+}
+  /* TITRES DU TABLEAU DE BORD */
+.admin-dashboard-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.dashboard-eyebrow {
+  color: #B18B3D;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.admin-dashboard-heading h2 {
+  color: #14243B;
+  margin: 8px 0;
+}
+
+.dashboard-section-title {
+  color: #14243B;
+  font-size: 16px;
+  margin: 25px 0 14px;
+  padding-bottom: 9px;
+  border-bottom: 1px solid #E2E7EF;
+}
+
+.dashboard-update {
+  margin-top: 25px;
+  padding: 15px;
+  background: #F5F7FA;
+  border-radius: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="taskelSplash">
+ <img src="taskel-icon.png" alt="Logo TASKEL">
+ <h2>TASKEL</h2>
+ <p>WORK • EARN • GROW</p>
+</div>
+
+<header class="taskel-header">
+ <img src="taskel-logo.png" alt="Logo TASKEL" class="taskel-logo">
+ <div>
+  <h2>TASKEL</h2>
+  <small>WORK • EARN • GROW</small>
+ </div>
+</header>
+
+<main>
+
+<section id="auth">
+ <div class="card">
+  <h3>Connexion</h3>
+  <input id="loginEmail" type="email" placeholder="Adresse e-mail">
+  <div class="password-field">
+   <input id="loginPassword" type="password" placeholder="Mot de passe">
+   <button type="button" id="loginPasswordEye" onclick="togglePassword('loginPassword','loginPasswordEye')">👁️</button>
+  </div>
+  <button onclick="login()">Se connecter</button>
+  <button class="secondary" onclick="resetPassword()">Mot de passe oublié</button>
+ </div>
+
+ <div class="card">
+  <h3>Créer un compte</h3>
+  <input id="regName" placeholder="Nom complet">
+  <input id="regPhone" placeholder="Numéro de téléphone">
+  <input id="regEmail" type="email" placeholder="Adresse e-mail">
+  <div class="password-field">
+   <input id="regPassword" type="password" placeholder="Créer un mot de passe">
+   <button type="button" id="regPasswordEye" onclick="togglePassword('regPassword','regPasswordEye')">👁️</button>
+  </div>
+  <input id="regReferral" placeholder="Code de parrainage (facultatif)">
+  <button onclick="register()">Créer mon compte</button>
+ </div>
+</section>
+
+<section id="app" class="hidden">
+
+ <div class="card">
+  <div class="row">
+   <div style="flex:2">
+    <strong id="welcome">Bienvenue</strong>
+    <div class="muted" id="roleText"></div>
+   </div>
+   <button class="secondary" onclick="logout()">Déconnexion</button>
+  </div>
+ </div>
+
+ <nav id="memberNav">
+  <button onclick="showPage('home')">Accueil</button>
+  <button onclick="showPage('deposit')">Dépôt</button>
+  <button onclick="showPage('participation')">Participation</button>
+  <button onclick="showPage('withdraw')">Retrait</button>
+  <button onclick="showPage('referrals')">Parrainage</button>
+  <button onclick="showPage('history')">Historique</button>
+ </nav>
+
+ 
+<aside id="adminSidebar" class="hidden">
+
+  <div class="sidebar-brand">
+    <div class="sidebar-logo">T</div>
+    <div>
+      <strong>TASKEL</strong>
+      <small>ADMINISTRATION</small>
+    </div>
+  </div>
+
+  <div class="sidebar-label">MENU PRINCIPAL</div>
+
+  <button data-page="adminHome" onclick="showPage('adminHome')">
+    <span>▦</span> Tableau de bord
+  </button>
+
+  <button data-page="adminMembers" onclick="showPage('adminMembers')">
+    <span>♙</span> Suivi des membres
+  </button>
+
+  <button data-page="adminDeposits" onclick="showPage('adminDeposits')">
+    <span>＋</span> Gestion des dépôts
+  </button>
+
+  <button data-page="adminWithdrawals" onclick="showPage('adminWithdrawals')">
+    <span>↗</span> Gestion des retraits
+  </button>
+
+  <button data-page="adminPayments" onclick="showPage('adminPayments')">
+    <span>▣</span> Moyens de paiement
+  </button>
+
+  <div class="sidebar-bottom">
+    <small>ESPACE SÉCURISÉ</small>
+    <button onclick="logout()">⇥ Déconnexion</button>
+  </div>
+
+</aside>
+
+ <!-- ESPACE MEMBRE -->
+
+<section id="home" class="page hidden">
+ <div class="card">
+  <h3>Mon portefeuille</h3>
+  <div class="grid">
+   <div class="stat">Solde disponible<strong id="balance">0 Ar</strong></div>
+   <div class="stat">Capital investi<strong id="locked">0 Ar</strong></div>
+   <div class="stat">Gains de participation<strong id="participationGains">0 Ar</strong></div>
+   <div class="stat">Gains de parrainage<strong id="referralGains">0 Ar</strong></div>
+   <div class="stat">Gains cumulés<strong id="earned">0 Ar</strong></div>
+  </div>
+  <p class="muted">Les gains cumulés correspondent aux récompenses de participation et aux bonus de parrainage effectivement crédités. Ils sont inclus dans le solde disponible. Les demandes de retrait restent soumises à validation par l'administrateur.</p>
+ </div>
+
+ <div class="card">
+  <h3>Mon lien de parrainage</h3>
+  <input id="myLink" readonly>
+  <button onclick="copyReferral()">Copier mon lien</button>
+ </div>
+
+ <div class="card">
+  <h3>Dernière participation</h3>
+  <p id="lastClick">Chargement...</p>
+  <button onclick="showPage('participation')">Accéder à la participation</button>
+ </div>
+</section>
+
+<section id="deposit" class="page hidden">
+ <div class="card deposit-card">
+  <div class="deposit-heading">
+   <h3>Effectuer un dépôt</h3>
+   <p class="muted">Choisis ton plan et effectue ton paiement.</p>
+  </div>
+
+  <div class="deposit-step">
+   <span class="deposit-number">01</span>
+   <div>
+    <h4>Choisir un plan</h4>
+    <p class="muted">Sélectionne ton investissement.</p>
+   </div>
+  </div>
+
+  <div class="deposit-plans">
+   <div class="deposit-plan"><strong>V1</strong><span>50 000 Ar</span></div>
+   <div class="deposit-plan"><strong>V2</strong><span>100 000 Ar</span></div>
+   <div class="deposit-plan"><strong>V3</strong><span>300 000 Ar</span></div>
+   <div class="deposit-plan featured"><strong>V4</strong><span>500 000 Ar</span></div>
+  </div>
+
+  <label for="planSelect">Plan d'investissement</label>
+  <select id="planSelect"></select>
+
+  <div class="deposit-divider"></div>
+
+  <div class="deposit-step">
+   <span class="deposit-number">02</span>
+   <div>
+    <h4>Informations de paiement</h4>
+    <p class="muted">Choisis ton moyen de paiement.</p>
+   </div>
+  </div>
+
+  <label for="depositMethod">Moyen de paiement</label>
+  <select id="depositMethod" onchange="updatePaymentDetails()"></select>
+
+  <div id="paymentDetails" class="stat">Sélectionne un moyen de paiement.</div>
+
+  <label for="senderPhone">Numéro de téléphone expéditeur</label>
+  <input id="senderPhone" type="tel" placeholder="Ex : 034 00 000 00">
+
+  <label for="depositReference">Référence de transaction</label>
+  <input id="depositReference" type="text" placeholder="Entre la référence de paiement">
+
+  <button class="deposit-submit" onclick="submitDeposit()">Envoyer ma demande de dépôt</button>
+
+  <div class="deposit-security">
+   <strong>Vérification de sécurité</strong>
+   <p class="muted">Ton dépôt reste en attente jusqu'à la vérification réelle du paiement par l'administrateur.</p>
+  </div>
+ </div>
+
+ <div class="card">
+  <h3>Historique de mes dépôts</h3>
+  <div id="myDeposits"></div>
+ </div>
+</section>
+
+<section id="participation" class="page hidden">
+ <div class="card">
+  <h3>Participation quotidienne</h3>
+  <p>Une seule participation est autorisée par jour civil à Madagascar.</p>
+  <div class="stat">Récompense indicative<strong id="dailyAmount">0 Ar</strong></div>
+  <p class="muted">La récompense correspond à 3 % du total de tes dépôts approuvés. Après une participation réussie, elle est automatiquement créditée dans ton solde disponible.</p>
+  <button id="clickButton" onclick="dailyClick()">Participer aujourd'hui</button>
+  <p id="clickMessage"></p>
+  <p id="dailyCountdown" class="muted"></p>
+ </div>
+
+ <div class="card">
+  <h3>Historique des participations</h3>
+  <div id="clickHistory"></div>
+ </div>
+</section>
+
+<section id="withdraw" class="page hidden">
+ <div class="card withdraw-card">
+  <div class="withdraw-heading">
+   <h3>Effectuer un retrait</h3>
+   <p class="muted">Retire tes gains directement sur ton portefeuille mobile.</p>
+  </div>
+
+  <div class="withdraw-balance">
+   <span>Solde disponible</span>
+   <strong id="withdrawBalance">0 Ar</strong>
+   <small>Montant disponible pour le retrait</small>
+  </div>
+
+  <div class="withdraw-step">
+   <span class="withdraw-number">01</span>
+   <div>
+    <h4>Montant du retrait</h4>
+    <p class="muted">Sélectionne un montant autorisé.</p>
+   </div>
+  </div>
+
+  <label for="withdrawAmount">Choisir un montant</label>
+  <select id="withdrawAmount">
+   <option value="7000">7 000 Ar</option>
+   <option value="30000">30 000 Ar</option>
+   <option value="100000">100 000 Ar</option>
+  </select>
+
+  <div class="withdraw-step">
+   <span class="withdraw-number">02</span>
+   <div>
+    <h4>Moyen de réception</h4>
+    <p class="muted">Choisis ton portefeuille mobile.</p>
+   </div>
+  </div>
+
+  <div class="withdraw-methods">
+   <div class="withdraw-method"><strong>Orange Money</strong><span>Réception mobile</span></div>
+   <div class="withdraw-method"><strong>MVola</strong><span>Réception mobile</span></div>
+  </div>
+
+  <label for="withdrawMethod">Opérateur de paiement</label>
+  <select id="withdrawMethod">
+   <option>Orange Money</option>
+   <option>MVola</option>
+  </select>
+
+  <label for="withdrawPhone">Numéro de réception</label>
+  <input id="withdrawPhone" type="tel" placeholder="Ex : 034 00 000 00">
+
+  <button class="withdraw-submit" onclick="requestWithdrawal()">Envoyer ma demande de retrait</button>
+
+  <div class="withdraw-notice">
+   <strong>Informations importantes</strong>
+   <p class="muted">Seuls les montants proposés sont autorisés. Une demande en attente réserve le montant correspondant. Une seule demande de retrait est autorisée par jour.</p>
+  </div>
+ </div>
+
+ <div class="card">
+  <h3>Historique de mes retraits</h3>
+  <div id="myWithdrawals"></div>
+ </div>
+</section>
+
+<section id="referrals" class="page hidden">
+ <div class="card referral-card">
+  <div class="referral-heading">
+   <h3>Mon programme de parrainage</h3>
+   <p class="muted">Développe ton réseau et bénéficie des bonus de parrainage.</p>
+  </div>
+
+  <div class="referral-banner">
+   <span>TON BONUS DE PARRAINAGE</span>
+   <strong>20 %</strong>
+   <p>Tu reçois un bonus lorsque le dépôt éligible de ton filleul est approuvé.</p>
+  </div>
+
+  <div class="referral-info">
+   <div class="referral-icon">01</div>
+   <div><strong>Invite tes proches</strong><p class="muted">Partage ton code de parrainage avec tes proches.</p></div>
+  </div>
+
+  <div class="referral-info">
+   <div class="referral-icon">02</div>
+   <div><strong>Ton filleul effectue un dépôt</strong><p class="muted">Son dépôt est vérifié par l'administrateur.</p></div>
+  </div>
+
+  <div class="referral-info">
+   <div class="referral-icon">03</div>
+   <div><strong>Ton bonus est crédité</strong><p class="muted">Le bonus de 20 % est automatiquement crédité après approbation du dépôt éligible.</p></div>
+  </div>
+ </div>
+
+ <div class="card">
+  <h3>Mes filleuls</h3>
+  <p class="muted">Consulte ici les personnes inscrites grâce à ton parrainage.</p>
+  <div id="myReferrals"></div>
+ </div>
+</section>
+
+<section id="history" class="page hidden">
+ <div class="card">
+  <h3>Mes transactions</h3>
+  <div id="myTransactions"></div>
+ </div>
+</section>
+
+<!-- ESPACE ADMINISTRATEUR -->
+
+<div id="adminPages">
+  
+<section id="adminHome" class="page hidden">
+
+  <div class="card admin-dashboard">
+
+    <div class="admin-dashboard-heading">
+      <div>
+        <span class="dashboard-eyebrow">ESPACE ADMINISTRATEUR</span>
+        <h2>Tableau de bord</h2>
+        <p class="muted">Vue générale de l'activité TASKEL</p>
+      </div>
+
+      <button class="secondary" onclick="loadAdmin()">
+        ↻ Actualiser
+      </button>
+    </div>
+
+    <h3 class="dashboard-section-title">Vue financière</h3>
+
+    <div class="grid">
+      <div class="stat">
+        Membres inscrits
+        <strong id="adminMembersCount">0</strong>
+      </div>
+
+      <div class="stat">
+        Dépôts validés
+        <strong id="adminDepositsTotal">0 Ar</strong>
+      </div>
+
+      <div class="stat">
+        Retraits payés
+        <strong id="adminWithdrawalsTotal">0 Ar</strong>
+      </div>
+
+      <div class="stat">
+        Différence comptable
+        <strong id="adminRemaining">0 Ar</strong>
+      </div>
+    </div>
+
+    <h3 class="dashboard-section-title">Suivi des demandes</h3>
+
+    <div class="grid">
+      <div class="stat">
+        Dépôts en attente
+        <strong id="adminPendingDeposits">0</strong>
+      </div>
+
+      <div class="stat">
+        Retraits en attente
+        <strong id="adminPendingWithdrawals">0</strong>
+      </div>
+
+      <div class="stat">
+        Montant des dépôts en attente
+        <strong id="adminPendingDepositAmount">0 Ar</strong>
+      </div>
+
+      <div class="stat">
+        Montant des retraits en attente
+        <strong id="adminPendingWithdrawalAmount">0 Ar</strong>
+      </div>
+    </div>
+
+    <h3 class="dashboard-section-title">Récompenses des membres</h3>
+
+    <div class="grid">
+      <div class="stat">
+        Gains de participation crédités
+        <strong id="adminClickGains">0 Ar</strong>
+      </div>
+
+      <div class="stat">
+        Bonus de parrainage crédités
+        <strong id="adminReferralGains">0 Ar</strong>
+      </div>
+
+      <div class="stat">
+        Total des gains crédités
+        <strong id="adminTotalGains">0 Ar</strong>
+      </div>
+    </div>
+
+    <div class="dashboard-update">
+      <p id="adminLastUpdate" class="muted">
+        Dernière actualisation : —
+      </p>
+
+      <p class="muted">
+        La différence entre les dépôts approuvés et les retraits payés
+        est un indicateur comptable, pas une preuve de trésorerie disponible.
+        Les montants en attente ne sont pas encore validés.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="adminDeposits" class="page hidden">
+ <div class="card">
+  <h3>Gestion des dépôts</h3>
+  <div class="grid">
+   <div class="stat">Demandes en attente<strong id="depositPendingCount">0</strong></div>
+   <div class="stat">Montant en attente<strong id="depositPendingTotal">0 Ar</strong></div>
+   <div class="stat">Dépôts validés<strong id="depositApprovedTotal">0 Ar</strong></div>
+  </div>
+  <button class="secondary" onclick="loadAdminDeposits()">Actualiser les dépôts</button>
+  <div id="adminDepositList"></div>
+ </div>
+</section>
+
+<section id="adminWithdrawals" class="page hidden">
+ <div class="card">
+  <h3>Gestion des retraits</h3>
+  <div class="grid">
+   <div class="stat">Demandes en attente<strong id="withdrawPendingCount">0</strong></div>
+   <div class="stat">Montant en attente<strong id="withdrawPendingTotal">0 Ar</strong></div>
+   <div class="stat">Retraits déjà payés<strong id="withdrawPaidTotal">0 Ar</strong></div>
+  </div>
+  <button class="secondary" onclick="loadAdminWithdrawals()">Actualiser les retraits</button>
+  <div id="adminWithdrawalList"></div>
+ </div>
+</section>
+
+<section id="adminMembers" class="page hidden">
+ <div class="card">
+  <h3>Gestion des membres</h3>
+  <input id="memberSearch" placeholder="Rechercher un membre" oninput="filterMembers()">
+  <div id="adminMemberList"></div>
+ </div>
+
+ <div id="memberDetail" class="card hidden">
+  <button class="secondary" onclick="closeMemberDetail()">Fermer le dossier</button>
+  <div id="memberDetailContent"></div>
+ </div>
+</section>
+
+<section id="adminPayments" class="page hidden">
+ <div class="card">
+  <h3>Moyens de paiement</h3>
+  <input id="payService" placeholder="Service (Orange Money, MVola...)">
+  <input id="payName" placeholder="Nom du titulaire">
+  <input id="payNumber" placeholder="Numéro de réception">
+  <button onclick="addPaymentMethod()">Ajouter un moyen de paiement</button>
+  <div id="adminPaymentList"></div>
+ </div>
+</section>
+  
+<div id="editPaymentModal" class="hidden">
+  <div class="card">
+    <h3>Modifier le moyen de paiement</h3>
+
+    <input id="editPayService" placeholder="Opérateur">
+    <input id="editPayName" placeholder="Nom du titulaire">
+    <input id="editPayNumber" placeholder="Numéro de réception">
+
+    <button onclick="savePaymentEdit()">Enregistrer les modifications</button>
+    <button class="secondary" onclick="closePaymentEdit()">Annuler</button>
+  </div>
+</div>
+
+  
+  </div>
+<!-- FIN DES PAGES ADMINISTRATEUR -->
+
+</section>
+
+<div id="message" class="card hidden"></div>
+</main>
+<script>
+const SUPABASE_URL="https://dtsmzmcqimtbkaorlalx.supabase.co";
+const SUPABASE_KEY="sb_publishable_hN0Q_u9gvn32cfQKcT0Bvw_xDbww8Fn";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let user=null;
+let profile=null;
+let wallet=null;
+let members=[];
+let activeUserId=null;
+let dailyTimer=null;
+
+const el=id=>document.getElementById(id);
+const money=n=>Number(n||0).toLocaleString("fr-FR")+" Ar";
+const safe=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dateText=s=>s?new Date(s).toLocaleString("fr-FR"):"—";
+
+/* AFFICHER OU MASQUER LE MOT DE PASSE */
+function togglePassword(inputId,buttonId){
+ const passwordInput=el(inputId);
+ const eyeButton=el(buttonId);
+ if(!passwordInput||!eyeButton)return;
+
+ if(passwordInput.type==="password"){
+  passwordInput.type="text";
+  eyeButton.textContent="🙈";
+  eyeButton.setAttribute("aria-label","Masquer le mot de passe");
+ }else{
+  passwordInput.type="password";
+  eyeButton.textContent="👁️";
+  eyeButton.setAttribute("aria-label","Afficher le mot de passe");
+ }
+}
+
+function msg(t){
+ el("message").textContent=t;
+ el("message").classList.remove("hidden");
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function hideMsg(){
+ el("message").classList.add("hidden");
+}
+
+/* NAVIGATION ET SEPARATION DES ESPACES */
+function showPage(id){
+ const adminPages=["adminHome","adminDeposits","adminWithdrawals","adminMembers","adminPayments"];
+ const memberPages=["home","deposit","participation","withdraw","referrals","history"];
+
+ if(adminPages.includes(id)&&profile?.role!=="admin"){
+  return msg("Accès administrateur refusé.");
+ }
+
+ if(memberPages.includes(id)&&profile?.role==="admin"){
+  return msg("Cette page est réservée aux membres.");
+ }
+
+ document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+
+ const page=el(id);
+ if(!page)return;
+
+ page.classList.remove("hidden");
+  
+document.querySelectorAll("#adminSidebar button[data-page]")
+  .forEach(b => {
+    b.classList.toggle("active", b.dataset.page === id);
+  });
+
+ hideMsg();
+
+ if(id==="home")loadMemberHome();
+
+ if(id==="deposit"){
+  loadPlansAndMethods();
+  loadMemberDeposits();
+ }
+
+ if(id==="participation")loadParticipation();
+ if(id==="withdraw")loadMemberWithdrawals();
+ if(id==="referrals")loadReferrals();
+ if(id==="history")loadTransactions();
+
+ if(id==="adminHome")loadAdmin();
+ if(id==="adminDeposits")loadAdminDeposits();
+ if(id==="adminWithdrawals")loadAdminWithdrawals();
+ if(id==="adminMembers")loadAdminMembers();
+ if(id==="adminPayments")loadAdminPayments();
+}
+
+/* AUTHENTIFICATION */
+async function register(){
+ const full_name=el("regName").value.trim();
+ const phone=el("regPhone").value.trim();
+ const email=el("regEmail").value.trim();
+ const password=el("regPassword").value;
+ const referral_code=el("regReferral").value.trim().toUpperCase();
+
+ if(!full_name||!phone||!email||password.length<6){
+  return msg("Remplis tous les champs. Mot de passe : 6 caractères minimum.");
+ }
+
+ const {data,error}=await db.auth.signUp({
+  email,
+  password,
+  options:{data:{full_name,phone,referral_code}}
+ });
+
+ if(error)return msg(error.message);
+
+ msg("Compte créé. Vérifie ton e-mail si la confirmation est activée.");
+}
+
+async function login(){
+ const email=el("loginEmail").value.trim();
+ const password=el("loginPassword").value;
+
+ const {data,error}=await db.auth.signInWithPassword({email,password});
+
+ if(error)return msg("Connexion impossible : "+error.message);
+
+ user=data.user;
+ await startApp();
+}
+
+
+async function logout(){
+ await db.auth.signOut();
+ document.body.classList.remove("admin-mode");
+ el("adminSidebar").classList.add("hidden");
+ el("memberNav").classList.remove("hidden");
+ el("app").classList.add("hidden");
+ el("auth").classList.remove("hidden");
+}
+
+
+async function resetPassword(){
+ const email=el("loginEmail").value.trim();
+
+ if(!email)return msg("Entre ton adresse e-mail.");
+
+ const {error}=await db.auth.resetPasswordForEmail(email,{redirectTo:location.href});
+
+ if(error)return msg(error.message);
+
+ msg("Lien de réinitialisation envoyé.");
+}
+
+async function startApp(){
+ const {data:{user:u}}=await db.auth.getUser();
+ if(!u)return;
+
+ user=u;
+
+ const {data:p,error}=await db.from("profiles")
+  .select("*").eq("id",user.id).single();
+
+ if(error)return msg("Profil introuvable : "+error.message);
+
+ profile=p;
+
+ const {data:w}=await db.from("wallets")
+  .select("*").eq("user_id",user.id).maybeSingle();
+
+ wallet=w||{};
+
+ el("auth").classList.add("hidden");
+ el("app").classList.remove("hidden");
+
+ el("welcome").textContent=profile.full_name||"Bienvenue";
+
+ const isAdmin=profile.role==="admin";
+
+ el("roleText").textContent=isAdmin?"Administrateur":"Membre";
+ el("memberNav").classList.toggle("hidden",isAdmin);
+ el("adminSidebar").classList.toggle("hidden",!isAdmin);
+document.body.classList.toggle("admin-mode",isAdmin);
+
+ if(isAdmin){
+  showPage("adminHome");
+ }else{
+  showPage("home");
+ }
+}
+
+/* OUTILS MEMBRE */
+function copyReferral(){
+ const x=el("myLink");
+ x.select();
+ document.execCommand("copy");
+ msg("Lien copié.");
+}
+
+async function loadMemberHome(){
+ if(!user)return;
+
+ const {data:w}=await db.from("wallets")
+  .select("*").eq("user_id",user.id).maybeSingle();
+
+ wallet=w||{};
+
+ const {data:tx}=await db.from("wallet_transactions")
+  .select("type,amount,status")
+  .eq("user_id",user.id)
+  .eq("status","completed");
+
+ const rows=tx||[];
+
+ const pg=rows.filter(x=>x.type==="daily_reward")
+  .reduce((s,x)=>s+Number(x.amount||0),0);
+
+ const rg=rows.filter(x=>x.type==="referral_bonus")
+  .reduce((s,x)=>s+Number(x.amount||0),0);
+
+ el("balance").textContent=money(wallet.balance);
+ el("locked").textContent=money(wallet.locked_balance);
+ el("participationGains").textContent=money(pg);
+ el("referralGains").textContent=money(rg);
+ el("earned").textContent=money(pg+rg);
+ el("withdrawBalance").textContent=money(wallet.balance);
+
+ const {data:p}=await db.from("profiles")
+  .select("referral_code").eq("id",user.id).single();
+
+ el("myLink").value=location.origin+location.pathname+"?ref="+(p?.referral_code||"");
+
+ const {data:last}=await db.from("daily_clicks")
+  .select("clicked_at,reward_amount")
+  .eq("user_id",user.id)
+  .order("clicked_at",{ascending:false})
+  .limit(1);
+
+ el("lastClick").textContent=last?.length
+  ?dateText(last[0].clicked_at)+" — "+money(last[0].reward_amount)
+  :"Aucune participation.";
+}
+
+async function loadMemberDeposits(){
+ const {data,error}=await db.from("deposits")
+  .select("*")
+  .eq("user_id",user.id)
+  .order("created_at",{ascending:false});
+
+ if(error)return msg(error.message);
+
+ el("myDeposits").innerHTML=(data||[]).map(d=>`
+  <div class="item">
+   <b>${money(d.amount)}</b> — ${safe(d.plan_code||"")}<br>
+   Statut : ${safe(d.status)}<br>
+   Référence : ${safe(d.transaction_reference||"—")}<br>
+   ${dateText(d.created_at)}
+  </div>
+ `).join("")||"Aucun dépôt.";
+}
+
+async function loadPlansAndMethods(){
+ const {data:plans,error:planError}=await db.from("investment_plans")
+  .select("*").eq("active",true).order("amount");
+
+ if(planError)return msg("Erreur plans : "+planError.message);
+
+ el("planSelect").innerHTML=(plans||[]).map(p=>
+  `<option value="${p.id}">${safe(p.code)} — ${money(p.amount)}</option>`
+ ).join("");
+
+ const {data:methods,error:methodError}=await db.from("payment_methods")
+  .select("*").eq("active",true);
+
+ if(methodError)return msg("Erreur moyens de paiement : "+methodError.message);
+
+ el("depositMethod").innerHTML=(methods||[]).map(p=>
+  `<option value="${p.id}">${safe(p.service)}</option>`
+ ).join("");
+
+ updatePaymentDetails();
+}
+
+async function updatePaymentDetails(){
+ const id=el("depositMethod").value;
+
+ if(!id){
+  el("paymentDetails").textContent="Aucun moyen de paiement disponible.";
+  return;
+ }
+
+ const {data:p,error}=await db.from("payment_methods")
+  .select("*").eq("id",id).maybeSingle();
+
+ if(error)return msg("Erreur moyen de paiement : "+error.message);
+
+ el("paymentDetails").innerHTML=p
+  ?`Service : <b>${safe(p.service)}</b><br>
+    Titulaire : ${safe(p.account_name)}<br>
+    Numéro : <b>${safe(p.account_number)}</b>`
+  :"Sélectionne un moyen de paiement.";
+}
+
+async function submitDeposit(){
+ const plan_id=el("planSelect").value;
+ const method_id=el("depositMethod").value;
+ const sender_phone=el("senderPhone").value.trim();
+ const transaction_reference=el("depositReference").value.trim();
+
+ if(!plan_id||!method_id||!sender_phone||!transaction_reference){
+  return msg("Remplis tous les champs du dépôt.");
+ }
+
+ const {data:plan,error:planError}=await db.from("investment_plans")
+  .select("*").eq("id",plan_id).single();
+
+ if(planError)return msg("Erreur plan : "+planError.message);
+
+ const {data:method,error:methodError}=await db.from("payment_methods")
+  .select("*").eq("id",method_id).single();
+
+ if(methodError)return msg("Erreur moyen de paiement : "+methodError.message);
+
+ const {error}=await db.from("deposits").insert({
+  user_id:user.id,
+  amount:plan.amount,
+  plan_code:plan.code,
+  method:method.service,
+  sender_phone,
+  transaction_reference,
+  status:"pending"
+ });
+
+ if(error)return msg("Erreur : "+error.message);
+
+ msg("Succès ! Demande de dépôt envoyée. Elle sera vérifiée par l'administrateur.");
+
+ el("senderPhone").value="";
+ el("depositReference").value="";
+
+ await loadMemberDeposits();
+}
+
+async function dailyClick(){
+ const b=el("clickButton");
+ b.disabled=true;
+
+ const {data,error}=await db.rpc("register_daily_click");
+
+ b.disabled=false;
+
+ if(error)return msg("Participation impossible : "+error.message);
+
+ msg("Succès ! "+(data?.message||"Participation enregistrée."));
+
+ await loadMemberHome();
+ await loadParticipation();
+}
+
+async function loadParticipation(){
+ const {data:clicks,error}=await db.from("daily_clicks")
+  .select("*").eq("user_id",user.id)
+  .order("clicked_at",{ascending:false}).limit(30);
+
+ if(error)return msg(error.message);
+
+ el("clickHistory").innerHTML=(clicks||[]).map(c=>`
+  <div class="item">
+   ${dateText(c.clicked_at)}<br>
+   Récompense : <b>${money(c.reward_amount)}</b>
+  </div>
+ `).join("")||"Aucune participation.";
+
+ const {data:dep}=await db.from("deposits")
+  .select("amount").eq("user_id",user.id).eq("status","approved");
+
+ const total=(dep||[]).reduce((s,x)=>s+Number(x.amount||0),0);
+
+ el("dailyAmount").textContent=money(total*.03);
+}
+
+async function requestWithdrawal(){
+ const amount=Number(el("withdrawAmount").value);
+ const method=el("withdrawMethod").value;
+ const phone=el("withdrawPhone").value.trim();
+
+ if(!phone)return msg("Entre le numéro de réception.");
+
+ const {data,error}=await db.rpc("create_withdrawal",{
+  p_amount:amount,
+  p_method:method,
+  p_phone:phone
+ });
+
+ if(error)return msg("Demande impossible : "+error.message);
+
+ msg("Succès ! Demande de retrait envoyée. Le montant est réservé en attente de validation.");
+
+ el("withdrawPhone").value="";
+
+ await loadMemberWithdrawals();
+ await loadMemberHome();
+}
+
+async function loadMemberWithdrawals(){
+ const {data,error}=await db.from("withdrawals")
+  .select("*").eq("user_id",user.id)
+  .order("created_at",{ascending:false});
+
+ if(error)return msg(error.message);
+
+ el("myWithdrawals").innerHTML=(data||[]).map(w=>`
+  <div class="item">
+   <b>${money(w.amount)}</b><br>
+   ${safe(w.method)} — ${safe(w.phone)}<br>
+   Statut : <span class="tag">${safe(w.status)}</span><br>
+   ${dateText(w.created_at)}
+  </div>
+ `).join("")||"Aucune demande.";
+}
+
+async function loadReferrals(){
+ const {data,error}=await db.from("referrals")
+  .select("*").eq("user_id",user.id)
+  .order("created_at",{ascending:false});
+
+ if(error)return msg(error.message);
+
+ el("myReferrals").innerHTML=(data||[]).map(r=>`
+  <div class="item">
+   Bonus : <b>${money(r.bonus)}</b><br>
+   Statut : ${safe(r.status)}<br>
+   ${dateText(r.created_at)}
+  </div>
+ `).join("")||"Aucun parrainage.";
+}
+
+async function loadTransactions(){
+ const {data,error}=await db.from("wallet_transactions")
+  .select("*").eq("user_id",user.id)
+  .order("created_at",{ascending:false}).limit(100);
+
+ if(error)return msg(error.message);
+
+ const types={
+  deposit:"Dépôt",
+  withdrawal:"Retrait",
+  daily_reward:"Gain de participation",
+  referral_bonus:"Bonus de parrainage",
+  task_reward:"Récompense de tâche",
+  adjustment:"Ajustement",
+  refund:"Remboursement"
+ };
+
+ const statuses={
+  completed:"Terminé",
+  pending:"En attente",
+  rejected:"Refusé"
+ };
+
+ el("myTransactions").innerHTML=(data||[]).map(t=>{
+  const type=types[t.type]||"Autre opération";
+  const status=statuses[t.status]||t.status;
+  const description=safe(t.description||"");
+  const colorType=["deposit","withdrawal","daily_reward","referral_bonus"].includes(t.type)?t.type:"";
+
+  return `
+   <div class="transaction-item type-${colorType}">
+    <div class="transaction-title">${type}</div>
+    <div class="transaction-amount">${money(t.amount)}</div>
+    ${description?`<p>${description}</p>`:""}
+    <span class="transaction-status ${safe(t.status)}">${safe(status)}</span>
+    <p class="muted">${dateText(t.created_at)}</p>
+   </div>
+  `;
+ }).join("")||"Aucune transaction.";
+}
+
+/* TABLEAU DE BORD ADMIN */
+async function loadAdmin(){
+ if(profile?.role!=="admin")return msg("Accès administrateur refusé.");
+
+ const {data,error}=await db.rpc("admin_get_financial_summary");
+
+ if(error){
+  console.error(error);
+  return msg("Résumé admin : "+error.message);
+ }
+
+ const s=data||{};
+
+ el("adminMembersCount").textContent=s.members_count??0;
+ el("adminDepositsTotal").textContent=money(s.approved_deposits);
+ el("adminWithdrawalsTotal").textContent=money(s.paid_withdrawals);
+
+ el("adminRemaining").textContent=money(
+  Number(s.approved_deposits||0)-Number(s.paid_withdrawals||0)
+ );
+
+ const participation=Number(s.participation_gains??s.daily_gains??0);
+ const referral=Number(s.referral_gains??0);
+
+ el("adminClickGains").textContent=money(participation);
+ el("adminReferralGains").textContent=money(referral);
+ el("adminPendingDeposits").textContent=s.pending_deposits_count??0;
+ el("adminPendingWithdrawals").textContent=s.pending_withdrawals_count??0;
+ el("adminPendingDepositAmount").textContent=money(s.pending_deposits_amount);
+ el("adminPendingWithdrawalAmount").textContent=money(s.pending_withdrawals_amount);
+ el("adminTotalGains").textContent=money(participation+referral);
+ el("adminLastUpdate").textContent="Dernière actualisation : "+new Date().toLocaleString("fr-FR");
+}
+
+/* GESTION DES DEPOTS ADMIN */
+async function loadAdminDeposits(){
+ if(profile?.role!=="admin")return msg("Accès administrateur refusé.");
+
+ const {data,error}=await db.from("deposits")
+  .select("*").order("created_at",{ascending:false});
+
+ if(error)return msg("Erreur dépôts : "+error.message);
+
+ const rows=data||[];
+ const ids=[...new Set(rows.map(x=>x.user_id).filter(Boolean))];
+
+ let profileRows=[];
+
+ if(ids.length){
+  const result=await db.from("profiles")
+   .select("id,full_name,phone").in("id",ids);
+
+  if(result.error)return msg("Erreur profils des dépôts : "+result.error.message);
+  profileRows=result.data||[];
+ }
+
+ const profileMap=new Map(profileRows.map(p=>[p.id,p]));
+ const pending=rows.filter(x=>String(x.status).toLowerCase()==="pending");
+ const approved=rows.filter(x=>x.status==="approved");
+
+ el("depositPendingCount").textContent=pending.length;
+ el("depositPendingTotal").textContent=money(pending.reduce((s,x)=>s+Number(x.amount||0),0));
+ el("depositApprovedTotal").textContent=money(approved.reduce((s,x)=>s+Number(x.amount||0),0));
+
+ el("adminDepositList").innerHTML=rows.map(d=>{
+  const p=profileMap.get(d.user_id)||{};
+
+  return `
+   <div class="item">
+    <b>${safe(p.full_name||"Membre")}</b><br>
+    Téléphone : ${safe(p.phone||"—")}<br>
+    Montant : <b>${money(d.amount)}</b><br>
+    Plan : ${safe(d.plan_code||"—")}<br>
+    Moyen : ${safe(d.method||"—")}<br>
+    Expéditeur : ${safe(d.sender_phone||"—")}<br>
+    Référence : ${safe(d.transaction_reference||"—")}<br>
+    Statut : <span class="tag">${safe(d.status)}</span><br>
+    Date : ${dateText(d.created_at)}
+    ${d.status==="pending"?`
+     <div class="admin-actions">
+      <button class="success" onclick="reviewDeposit('${d.id}','approved')">Valider</button>
+      <button class="danger" onclick="reviewDeposit('${d.id}','rejected')">Rejeter</button>
+     </div>
+    `:""}
+   </div>
+  `;
+ }).join("")||"Aucun dépôt.";
+}
+
+async function reviewDeposit(id,status){
+ if(!user||profile?.role!=="admin")return msg("Accès administrateur refusé.");
+
+ const question=status==="approved"
+  ?"As-tu réellement reçu l'argent ? Confirmer la validation du dépôt ?"
+  :"Confirmer le rejet de ce dépôt ?";
+
+ if(!(await askConfirmation(question)))return;
+
+ const {data:before,error:readError}=await db.from("deposits")
+  .select("id,status").eq("id",id).maybeSingle();
+
+ if(readError)return msg("Erreur : "+readError.message);
+ if(!before)return msg("Dépôt introuvable.");
+ if(before.status!=="pending")return msg("Ce dépôt a déjà été traité.");
+
+ const {data,error}=await db.from("deposits")
+  .update({
+   status,
+   reviewed_by:user.id,
+   reviewed_at:new Date().toISOString()
+  })
+  .eq("id",id).eq("status","pending").select("id,status");
+
+ if(error)return msg("Échec : "+error.message);
+ if(!data?.length)return msg("Aucune modification effectuée.");
+
+ await loadAdminDeposits();
+ await loadAdmin();
+
+ msg(status==="approved"?"Succès ! Dépôt validé.":"Succès ! Dépôt rejeté.");
+}
+
+/* GESTION DES RETRAITS ADMIN */
+async function loadAdminWithdrawals(){
+ if(profile?.role!=="admin")return msg("Accès administrateur refusé.");
+
+ el("adminWithdrawalList").innerHTML="Chargement des demandes de retrait...";
+
+ const {data,error}=await db.from("withdrawals")
+  .select("*").order("created_at",{ascending:false});
+
+ if(error){
+  el("adminWithdrawalList").innerHTML="";
+  return msg("ERREUR RETRAITS : "+error.message);
+ }
+
+ const rows=data||[];
+
+ const pending=rows.filter(x=>
+  ["pending","en attente"].includes(String(x.status||"").trim().toLowerCase())
+ );
+
+ const paid=rows.filter(x=>
+  String(x.status||"").trim().toLowerCase()==="paid"
+ );
+
+ el("withdrawPendingCount").textContent=pending.length;
+ el("withdrawPendingTotal").textContent=money(pending.reduce((s,x)=>s+Number(x.amount||0),0));
+ el("withdrawPaidTotal").textContent=money(paid.reduce((s,x)=>s+Number(x.amount||0),0));
+
+ if(!rows.length){
+  el("adminWithdrawalList").innerHTML=`
+   <div class="item">
+    <b>Aucune demande de retrait trouvée.</b><br>
+    <span class="muted">Si un membre a déjà demandé un retrait, vérifie les autorisations de lecture Supabase (RLS) sur la table withdrawals.</span>
+   </div>
+  `;
+  return;
+ }
+
+ const ids=[...new Set(rows.map(x=>x.user_id).filter(Boolean))];
+
+ let profileRows=[];
+ let walletRows=[];
+ let transactions=[];
+
+ if(ids.length){
+  const [profilesResult,walletResult,txResult]=await Promise.all([
+   db.from("profiles").select("id,full_name,phone").in("id",ids),
+   db.from("wallets").select("user_id,balance,locked_balance").in("user_id",ids),
+   db.from("wallet_transactions").select("user_id,type,amount,status").in("user_id",ids).eq("status","completed")
+  ]);
+
+  if(profilesResult.error)return msg("Erreur profils des membres : "+profilesResult.error.message);
+  if(walletResult.error)return msg("Erreur soldes des membres : "+walletResult.error.message);
+  if(txResult.error)return msg("Erreur gains des membres : "+txResult.error.message);
+
+  profileRows=profilesResult.data||[];
+  walletRows=walletResult.data||[];
+  transactions=txResult.data||[];
+ }
+
+ const profileMap=new Map(profileRows.map(x=>[x.id,x]));
+ const walletMap=new Map(walletRows.map(x=>[x.user_id,x]));
+
+ el("adminWithdrawalList").innerHTML=rows.map(w=>{
+  const status=String(w.status||"").trim().toLowerCase();
+  const isPending=["pending","en attente"].includes(status);
+  const member=profileMap.get(w.user_id)||{};
+  const memberWallet=walletMap.get(w.user_id)||{};
+  const userTx=transactions.filter(x=>x.user_id===w.user_id);
+
+  const participation=userTx.filter(x=>x.type==="daily_reward")
+   .reduce((s,x)=>s+Number(x.amount||0),0);
+
+  const referral=userTx.filter(x=>x.type==="referral_bonus")
+   .reduce((s,x)=>s+Number(x.amount||0),0);
+
+  return `
+   <div class="item">
+    <h3>${safe(member.full_name||"Membre")}</h3>
+    <p>Téléphone du membre : <b>${safe(member.phone||"—")}</b></p>
+
+    <div class="grid">
+     <div class="stat">Montant demandé<strong>${money(w.amount)}</strong></div>
+     <div class="stat">Solde disponible<strong>${money(memberWallet.balance)}</strong></div>
+     <div class="stat">Gains cumulés<strong>${money(participation+referral)}</strong></div>
+     <div class="stat">Capital investi<strong>${money(memberWallet.locked_balance)}</strong></div>
+    </div>
+
+    <p>Gains de participation : <b>${money(participation)}</b><br>
+    Gains de parrainage : <b>${money(referral)}</b></p>
+
+    <p>Moyen de paiement : ${safe(w.method||"—")}<br>
+    Numéro de réception : <b>${safe(w.phone||"—")}</b></p>
+
+    <p>Statut : <span class="tag">${safe(w.status)}</span></p>
+    <p class="muted">Date de demande : ${dateText(w.created_at)}</p>
+
+    ${isPending?`
+     <div class="admin-actions">
+      <button class="success" onclick="processWithdrawal('${w.id}','paid')">Confirmer payé</button>
+      <button class="danger" onclick="processWithdrawal('${w.id}','rejected')">Rejeter</button>
+     </div>
+    `:""}
+   </div>
+  `;
+ }).join("");
+}
+
+async function processWithdrawal(id,action){
+ if(!user||profile?.role!=="admin")return msg("Accès administrateur refusé.");
+ if(!["paid","rejected"].includes(action))return msg("Action non autorisée.");
+
+ const question=action==="paid"
+  ?"As-tu réellement envoyé l'argent au membre ? Le solde diminuera après confirmation."
+  :"Confirmer le rejet de cette demande ?";
+
+ if(!(await askConfirmation(question)))return;
+
+ const {data,error}=await db.rpc("admin_process_withdrawal",{
+  p_withdrawal_id:id,
+  p_action:action
+ });
+
+ if(error)return msg("Erreur traitement retrait : "+error.message);
+
+ await loadAdminWithdrawals();
+ await loadAdmin();
+
+ msg("Succès ! "+(data?.message||"Opération effectuée."));
+}
+
+/* GESTION DES MEMBRES */
+async function loadAdminMembers(){
+ if(profile?.role!=="admin")return msg("Accès administrateur refusé.");
+
+ const {data,error}=await db.from("profiles")
+  .select("id,full_name,phone,role,referral_code,created_at")
+  .eq("role","member").order("created_at",{ascending:true});
+
+ if(error)return msg(error.message);
+
+ members=data||[];
+ renderMemberList(members);
+}
+
+function renderMemberList(list){
+ el("adminMemberList").innerHTML=list.map(p=>`
+  <div class="item">
+   <b>${safe(p.full_name||"Sans nom")}</b><br>
+   Téléphone : ${safe(p.phone||"—")}<br>
+   Code : ${safe(p.referral_code||"—")}<br>
+   Inscription : ${dateText(p.created_at)}
+   <button onclick="viewMember('${p.id}')">Voir le dossier complet</button>
+  </div>
+ `).join("")||"Aucun membre trouvé.";
+}
+
+function filterMembers(){
+ const q=el("memberSearch").value.toLowerCase().trim();
+
+ renderMemberList(members.filter(p=>
+  [p.full_name,p.phone,p.referral_code,p.id]
+   .some(v=>String(v||"").toLowerCase().includes(q))
+ ));
+}
+
+async function viewMember(memberId){
+ if(profile?.role!=="admin")return msg("Accès administrateur refusé.");
+
+ const panel=el("memberDetail");
+ const content=el("memberDetailContent");
+
+ panel.classList.remove("hidden");
+ content.innerHTML="Chargement du dossier...";
+ panel.scrollIntoView({behavior:"smooth",block:"start"});
+
+ const {data,error}=await db.rpc("admin_get_member_details",{
+  p_member_id:memberId
+ });
+
+ if(error){
+  content.innerHTML="<p>Erreur : "+safe(error.message)+"</p>";
+  return;
+ }
+
+ if(!data||!data.profile){
+  content.textContent="Dossier introuvable.";
+  return;
+ }
+
+ const p=data.profile;
+ const w=data.wallet||{};
+ const deposits=data.deposits||[];
+ const clicks=data.participations||[];
+ const withdrawals=data.withdrawals||[];
+ const transactions=data.transactions||[];
+ const referrals=data.referrals||[];
+
+ const sum=(a,k)=>a.reduce((s,x)=>s+Number(x[k]||0),0);
+
+ const approved=deposits.filter(x=>x.status==="approved");
+ const pendingD=deposits.filter(x=>x.status==="pending");
+ const paid=withdrawals.filter(x=>x.status==="paid");
+ const pendingW=withdrawals.filter(x=>x.status==="pending");
+
+ const daily=transactions.filter(x=>x.type==="daily_reward"&&x.status==="completed");
+ const completedRef=referrals.filter(x=>x.status==="completed");
+
+ const pg=sum(daily,"amount");
+ const rg=sum(completedRef,"bonus");
+
+ content.innerHTML=`
+  <h3>${safe(p.full_name||"Membre")}</h3>
+  <p class="small">ID : ${safe(p.id)}</p>
+  <p>Téléphone : ${safe(p.phone||"—")}</p>
+  <p>Code de parrainage : ${safe(p.referral_code||"—")}</p>
+  <p>Inscription : ${dateText(p.created_at)}</p>
+
+  <h3>Résumé du portefeuille</h3>
+  <div class="grid">
+   <div class="stat">Solde disponible<strong>${money(w.balance)}</strong></div>
+   <div class="stat">Capital investi<strong>${money(w.locked_balance)}</strong></div>
+   <div class="stat">Gains participation<strong>${money(pg)}</strong></div>
+   <div class="stat">Gains parrainage<strong>${money(rg)}</strong></div>
+   <div class="stat">Gains cumulés<strong>${money(pg+rg)}</strong></div>
+  </div>
+
+  <h3>Dépôts (${deposits.length})</h3>
+  <p>Approuvé : <b>${money(sum(approved,"amount"))}</b> | En attente : <b>${money(sum(pendingD,"amount"))}</b></p>
+
+  ${deposits.map(d=>`
+   <div class="item">
+    <b>${money(d.amount)}</b> — ${safe(d.plan_code||"")}<br>
+    Moyen : ${safe(d.method||"—")}<br>
+    Expéditeur : ${safe(d.sender_phone||"—")}<br>
+    Référence : ${safe(d.transaction_reference||"—")}<br>
+    Statut : <span class="tag">${safe(d.status)}</span><br>
+    Date : ${dateText(d.created_at)}
+    ${d.status==="pending"?`
+     <div class="admin-actions">
+      <button class="success" onclick="reviewDepositFromDetail('${d.id}','approved','${memberId}')">Valider</button>
+      <button class="danger" onclick="reviewDepositFromDetail('${d.id}','rejected','${memberId}')">Rejeter</button>
+     </div>
+    `:""}
+   </div>
+  `).join("")||"<p>Aucun dépôt.</p>"}
+
+  <h3>Participations (${clicks.length})</h3>
+  <p>Gains crédités : <b>${money(pg)}</b></p>
+  ${clicks.map(c=>`
+   <div class="item">
+    ${dateText(c.clicked_at)}<br>
+    Récompense : ${money(c.reward_amount)}
+   </div>
+  `).join("")||"<p>Aucune participation.</p>"}
+
+  <h3>Retraits (${withdrawals.length})</h3>
+  <p>Payés : <b>${money(sum(paid,"amount"))}</b> | En attente : <b>${money(sum(pendingW,"amount"))}</b></p>
+  ${withdrawals.map(x=>`
+   <div class="item">
+    <b>${money(x.amount)}</b> — ${safe(x.method||"")}<br>
+    Numéro : ${safe(x.phone||"")}<br>
+    Statut : <span class="tag">${safe(x.status)}</span><br>
+    Date : ${dateText(x.created_at)}
+    ${x.status==="pending"?`
+     <div class="admin-actions">
+      <button class="success" onclick="processWithdrawal('${x.id}','paid')">Confirmer payé</button>
+      <button class="danger" onclick="processWithdrawal('${x.id}','rejected')">Rejeter</button>
+     </div>
+    `:""}
+   </div>
+  `).join("")||"<p>Aucun retrait.</p>"}
+
+  <h3>Bonus de parrainage (${referrals.length})</h3>
+  <p>Bonus crédités : <b>${money(rg)}</b></p>
+  ${referrals.map(r=>`
+   <div class="item">
+    Parrain : ${safe(r.user_id)}<br>
+    Filleul : ${safe(r.referred_user_id)}<br>
+    Bonus : ${money(r.bonus)}<br>
+    Statut : <span class="tag">${safe(r.status)}</span><br>
+    Date : ${dateText(r.created_at)}
+   </div>
+  `).join("")||"<p>Aucun bonus.</p>"}
+
+  <h3>Transactions (${transactions.length})</h3>
+  ${transactions.map(t=>`
+   <div class="item">
+    <b>${safe(t.type)}</b> — ${money(t.amount)}<br>
+    ${safe(t.description||"")}<br>
+    Statut : <span class="tag">${safe(t.status)}</span><br>
+    ${dateText(t.created_at)}<br>
+    Référence : ${safe(t.reference_id||"—")}
+   </div>
+  `).join("")||"<p>Aucune transaction.</p>"}
+ `;
+}
+
+ async function reviewDepositFromDetail(id,status,memberId){
+ if(!user||profile?.role!=="admin")return msg("Accès administrateur refusé.");
+
+ const q=status==="approved"
+  ?"Confirmer la validation de ce dépôt ? Vérifie que l'argent a réellement été reçu."
+  :"Confirmer le rejet de ce dépôt ?";
+
+ if(!(await askConfirmation(q)))return;
+
+ const {data:before,error:readError}=await db.from("deposits")
+  .select("id,status").eq("id",id).maybeSingle();
+
+ if(readError)return msg("Erreur : "+readError.message);
+ if(!before)return msg("Dépôt introuvable.");
+ if(before.status!=="pending")return msg("Ce dépôt a déjà été traité.");
+
+ const {data,error}=await db.from("deposits")
+  .update({
+   status,
+   reviewed_by:user.id,
+   reviewed_at:new Date().toISOString()
+  })
+  .eq("id",id).eq("status","pending").select("id,status");
+
+ if(error)return msg("Échec : "+error.message);
+ if(!data?.length)return msg("Aucune modification effectuée.");
+
+ await loadAdmin();
+ await loadAdminDeposits();
+ await viewMember(memberId);
+
+ msg(status==="approved"?"Succès ! Dépôt validé.":"Succès ! Dépôt rejeté.");
+}
+
+function closeMemberDetail(){
+ el("memberDetail").classList.add("hidden");
+ el("memberDetailContent").innerHTML="";
+}
+
+/* MOYENS DE PAIEMENT */
+  let confirmationResolver = null;
+
+function askConfirmation(message){
+  return new Promise(resolve => {
+    confirmationResolver = resolve;
+    el("confirmMessage").textContent = message;
+    el("confirmModal").classList.remove("hidden");
+  });
+}
+
+function resolveConfirmation(answer){
+  el("confirmModal").classList.add("hidden");
+
+  if(confirmationResolver){
+    confirmationResolver(answer);
+    confirmationResolver = null;
+  }
+}
+async function addPaymentMethod(){
+ const service=el("payService").value.trim();
+ const account_name=el("payName").value.trim();
+ const account_number=el("payNumber").value.trim();
+
+ if(!service||!account_name||!account_number)return msg("Remplis les trois champs.");
+
+ const {error}=await db.from("payment_methods").insert({
+  service,
+  account_name,
+  account_number,
+  active:true
+ });
+
+ if(error)return msg(error.message);
+
+ el("payService").value="";
+ el("payName").value="";
+ el("payNumber").value="";
+
+ msg("Succès ! Moyen de paiement ajouté.");
+
+ await loadAdminPayments();
+}
+
+async function loadAdminPayments(){
+ if(profile?.role!=="admin")return msg("Accès administrateur refusé.");
+
+ const {data,error}=await db.from("payment_methods")
+  .select("*").order("id");
+
+ if(error)return msg(error.message);
+
+ el("adminPaymentList").innerHTML=(data||[]).map(p=>`
+  <div class="item">
+   <b>${safe(p.service)}</b><br>
+   ${safe(p.account_name)} — ${safe(p.account_number)}<br>
+   État : ${p.active?"Actif":"Inactif"}
+   <button class="secondary" onclick="editPayment('${p.id}')">
+ Modifier
+</button>
+
+<button class="secondary" onclick="togglePayment('${p.id}',${!p.active})">
+ ${p.active?"Désactiver":"Activer"}
+</button>
+  </div>
+ `).join("")||"Aucun moyen de paiement.";
+}
+  
+let editingPaymentId = null;
+
+async function editPayment(id){
+ const {data,error}=await db
+  .from("payment_methods")
+  .select("*")
+  .eq("id",id)
+  .single();
+
+ if(error)return msg(error.message);
+ if(!data)return msg("Moyen de paiement introuvable.");
+
+ editingPaymentId=id;
+
+ el("editPayService").value=data.service||"";
+ el("editPayName").value=data.account_name||"";
+ el("editPayNumber").value=data.account_number||"";
+
+ el("editPaymentModal").classList.remove("hidden");
+}
+
+function closePaymentEdit(){
+ editingPaymentId=null;
+ el("editPaymentModal").classList.add("hidden");
+}
+
+async function savePaymentEdit(){
+ if(!editingPaymentId)return;
+
+ const service=el("editPayService").value.trim();
+ const account_name=el("editPayName").value.trim();
+ const account_number=el("editPayNumber").value.trim();
+
+ if(!service||!account_name||!account_number){
+  return msg("Remplis les trois champs.");
+ }
+
+ const {error}=await db
+  .from("payment_methods")
+  .update({
+   service,
+   account_name,
+   account_number
+  })
+  .eq("id",editingPaymentId);
+
+ if(error)return msg(error.message);
+
+ closePaymentEdit();
+ msg("Moyen de paiement modifié avec succès !");
+ await loadAdminPayments();
+}
+
+
+async function togglePayment(id,active){
+ const {error}=await db.from("payment_methods")
+  .update({active}).eq("id",id);
+
+ if(error)return msg(error.message);
+
+ msg("Succès ! Moyen de paiement modifié.");
+
+ await loadAdminPayments();
+}
+
+/* SESSION */
+db.auth.onAuthStateChange((event,session)=>{
+ if(event==="SIGNED_IN"&&session){
+  setTimeout(()=>startApp(),0);
+ }
+
+ if(event==="SIGNED_OUT"){
+  user=null;
+  profile=null;
+  wallet=null;
+  activeUserId=null;
+
+  if(dailyTimer){
+   clearInterval(dailyTimer);
+   dailyTimer=null;
+  }
+ }
+});
+
+(async()=>{
+ const {data:{session},error}=await db.auth.getSession();
+
+ if(error){
+  console.error(error);
+  return;
+ }
+
+ if(session)await startApp();
+
+ const code=new URLSearchParams(location.search).get("ref");
+
+ if(code){
+  el("regReferral").value=code.trim().toUpperCase();
+ }
+})();
+
+/* FERMETURE DE L'ECRAN DE DEMARRAGE */
+window.addEventListener("load",function(){
+ setTimeout(function(){
+  const splash=el("taskelSplash");
+
+  if(splash){
+   splash.style.opacity="0";
+   setTimeout(function(){
+    splash.remove();
+   },500);
+  }
+ },1500);
+});
+</script>
+<!-- FENÊTRE DE CONFIRMATION TASKEL -->
+<div id="confirmModal" class="hidden">
+  <div class="card confirm-box">
+    <h3 id="confirmTitle">Confirmation</h3>
+
+    <p id="confirmMessage">
+      Voulez-vous vraiment continuer ?
+    </p>
+
+    <div class="confirm-buttons">
+      <button class="secondary"
+        onclick="resolveConfirmation(false)">
+        Annuler
+      </button>
+
+      <button onclick="resolveConfirmation(true)">
+        Confirmer
+      </button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
